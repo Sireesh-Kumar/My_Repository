@@ -1,0 +1,108 @@
+import speech_recognition as sr
+import pyttsx3
+import datetime
+import wikipedia
+import webbrowser
+import os
+import pyjokes
+import requests
+import random
+
+
+# Initialize speech recognizer and text-to-speech engine
+r = sr.Recognizer()
+engine = pyttsx3.init()
+
+# Set voice (optional, comment out if you prefer default voice)
+# voices = engine.getProperty('voices')
+# engine.setProperty('voice', voices[1].id)  # Adjust index for different voices
+
+
+def speak(text):
+  """Speaks the given text aloud."""
+  engine.say(text)
+  engine.runAndWait()
+
+
+def recognize_speech():
+  """Listens for user speech and returns the recognized text."""
+  with sr.Microphone() as source:
+    print("Listening...")
+    audio = r.listen(source)
+
+    try:
+      print("Recognizing...")
+      query = r.recognize_google(audio, language='en-us')
+      print(f"You said: {query}\n")
+    except Exception as e:
+      print("Sorry, I did not understand that.")
+      query = None
+
+    return query
+
+
+def greet():
+  """Greets the user based on the current time."""
+  hour = datetime.datetime.now().hour
+  if hour >= 0 and hour < 12:
+    speak("Good morning!")
+  elif hour >= 12 and hour < 18:
+    speak("Good afternoon!")
+  else:
+    speak("Good evening!")
+
+  speak("How can I help you today?")
+
+
+class Assistant:
+  def __init__(self):
+    self.greet()
+    self.main()
+
+  def main(self):
+    """Main loop that listens for user input and performs tasks."""
+    while True:
+      query = recognize_speech()
+
+      if query:
+        # Perform various tasks based on recognized commands
+        if 'wikipedia' in query.lower():
+          speak('Searching Wikipedia...')
+          query = query.replace("wikipedia", "")
+          results = wikipedia.summary(query, sentences=2)
+          speak("According to Wikipedia")
+          print(results)
+          speak(results)
+        elif 'add to my to do list' in query.lower():
+          # Placeholder for adding to-do list (implement logic here)
+          speak("I'm still learning to manage to-do lists. What would you like to add?")
+        elif 'show me my to do list' in query.lower():
+          # Placeholder for showing to-do list (implement logic here)
+          speak("I'm still learning to manage to-do lists. Can I help you with anything else?")
+        elif 'open youtube' in query.lower():
+          webbrowser.open("youtube.com")
+          speak("Opening YouTube...")
+        elif 'open google' in query.lower():
+          webbrowser.open("google.com")
+          speak("Opening Google...")
+        elif 'play music' in query.lower():
+          music_dir = 'C:/Users/nikit/Music'  # Update with your music directory
+          songs = os.listdir(music_dir)
+          if songs:
+            os.startfile(os.path.join(music_dir, songs[0]))
+          else:
+            speak("Sorry, I could not find any music.")
+        elif 'what time is it' in query.lower():
+          time = datetime.datetime.now().strftime("%H:%M:%S")
+          speak(f"The time is {time}")
+        elif 'tell me a joke' in query.lower():
+          joke = pyjokes.get_joke()
+          speak(joke)
+        # ... (rest of the functionality remains the same)
+        elif 'thank you' in query.lower() or 'thanks' in query.lower():
+          speak("You're welcome!")
+          break
+
+
+if __name__ == '__main__':
+  assistant = Assistant()
